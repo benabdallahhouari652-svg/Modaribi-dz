@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===== DARK MODE ===== */
+html.dark body {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* Cards & containers */
+html.dark .bg-white { background-color: #1e293b !important; }
+
+/* Text colors */
+html.dark .text-gray-900 { color: #f1f5f9 !important; }
+html.dark .text-gray-800 { color: #e2e8f0 !important; }
+html.dark .text-gray-700 { color: #cbd5e1 !important; }
+html.dark .text-gray-600 { color: #94a3b8 !important; }
+html.dark .text-gray-500 { color: #64748b !important; }
+html.dark .text-gray-400 { color: #64748b !important; }
+
+/* Backgrounds */
+html.dark .bg-gray-50 { background-color: #1e293b !important; }
+html.dark .bg-gray-100 { background-color: #334155 !important; }
+html.dark .bg-emerald-50 { background-color: rgba(52, 211, 153, 0.1) !important; }
+html.dark .bg-amber-50 { background-color: rgba(251, 191, 36, 0.1) !important; }
+html.dark .bg-blue-50 { background-color: rgba(96, 165, 250, 0.1) !important; }
+html.dark .bg-red-50 { background-color: rgba(248, 113, 113, 0.1) !important; }
+html.dark .bg-purple-50 { background-color: rgba(192, 132, 252, 0.1) !important; }
+
+/* Borders */
+html.dark .border-gray-200 { border-color: #475569 !important; }
+html.dark .border-gray-100 { border-color: #334155 !important; }
+html.dark .border-gray-300 { border-color: #475569 !important; }
+
+/* Hovers */
+html.dark .hover\:bg-emerald-50:hover { background-color: rgba(52, 211, 153, 0.1) !important; }
+html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+html.dark .hover\:shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4) !important; }
+
+/* Navbar */
+html.dark .bg-white\/95 { background-color: rgba(15, 23, 42, 0.95) !important; backdrop-filter: blur(8px) !important; }
+
+/* Inputs & selects */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #334155 !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Emerald accents */
+html.dark .text-emerald-700 { color: #34d399 !important; }
+html.dark .text-emerald-600 { color: #34d399 !important; }
+html.dark .bg-emerald-100 { background-color: rgba(52, 211, 153, 0.15) !important; }
+html.dark .text-emerald-700 { color: #34d399 !important; }
+
+/* Forms */
+html.dark .bg-emerald-600 { background-color: #059669 !important; }
+html.dark .hover\:bg-emerald-700:hover { background-color: #047857 !important; }
+
+/* Scrollbar */
+html.dark ::-webkit-scrollbar-track { background: #1e293b; }
+html.dark ::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
+
+/* Dividers */
+html.dark hr { border-color: #334155 !important; }
+
+/* Shadows */
+html.dark .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important; }

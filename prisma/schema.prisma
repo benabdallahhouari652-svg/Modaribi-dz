@@ -1,0 +1,376 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========== المستخدمون (المختصون/المدربون) ==========
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Auth
+  email          String   @unique
+  passwordHash   String
+  name           String
+  surname        String?    // اللقب (الاسم العائلي)
+  nameArabic     String?
+  role           UserRole @default(USER)
+  isActive       Boolean  @default(true)
+
+  // Profile
+  avatar         String?    // رابط الصورة الشخصية
+  bio            String?    // نبذة قصيرة
+  cv             String?    // السيرة الذاتية الكاملة (نص طويل)
+  phone          String?
+  whatsapp       String?
+  wilaya         String?
+  municipality   String?
+  maritalStatus  MaritalStatus? @default(SINGLE) // الحالة العائلية
+  gender         Gender? // الجنس (ذكر / أنثى)
+
+  // Professional info
+  title          String? // المدرب, المحضر البدني, إلخ
+  experienceYears Int?
+  languages      String? // JSON array
+  ageGroupTarget String? // الأطفال, الشباب, الكبار, كل الفئات
+  trainingType   TrainingType? // فردي, جماعي, كلاهما
+
+  // Availability
+  availability   AvailabilityStatus? @default(AVAILABLE)
+  isContracted   Boolean @default(false) // هل مرتبط بعقد مع فريق/نادي
+  acceptsRemoteWork  Boolean @default(false)
+  acceptsTravel      Boolean @default(false)
+  acceptsWorkOutside Boolean @default(false)
+
+  // Social & Media
+  website        String?
+  facebook       String?
+  instagram      String?
+  youtube        String?
+  linkedin       String?
+
+  // Rating
+  ratingAvg      Float   @default(0)
+  ratingCount    Int     @default(0)
+
+  // Relations
+  competencies  Competency[]
+  certifications Certification[]
+  reviewsGiven  Review[]          @relation("Reviewer")
+  reviewsReceived Review[]        @relation("Target")
+  messagesSent     Message[]      @relation("Sender")
+  messagesReceived Message[]      @relation("Receiver")
+  libraryResources LibraryResource[]
+  innovations    Innovation[]
+  articles       Article[]
+  sessions       Session[]
+
+  webinars       Webinar[]      @relation("WebinarCreator")
+
+  @@map("users")
+}
+
+// ========== الأدوار ==========
+enum UserRole {
+  USER        // مستخدم عادي
+  SPECIALIST  // مختص (مدرب, إلخ)
+  CLUB        // نادي أو أكاديمية
+  ADMIN       // مشرف
+  SUPER_ADMIN // مدير المنصة
+
+  @@map("user_roles")
+}
+
+// ========== حالة التوفر ==========
+enum AvailabilityStatus {
+  AVAILABLE
+  BUSY
+  UNAVAILABLE
+
+  @@map("availability_statuses")
+}
+
+// ========== نوع التدريب ==========
+enum TrainingType {
+  INDIVIDUAL
+  GROUP
+  BOTH
+
+  @@map("training_types")
+}
+
+// ========== الحالة العائلية ==========
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+
+  @@map("marital_statuses")
+}
+
+// ========== الجنس ==========
+enum Gender {
+  MALE
+  FEMALE
+
+  @@map("genders")
+}
+
+// ========== أنواع الشهادات ==========
+enum CertificationType {
+  COACHING            // شهادة تدريب
+  ACADEMIC            // شهادة جامعية
+  PROFESSIONAL        // شهادة مهنية
+  INTERNATIONAL       // شهادة دولية
+  TRAINING            // دورة تكوينية
+  OTHER               // أخرى
+
+  @@map("certification_types")
+}
+
+// ========== الشهادات ==========
+model Certification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String             // اسم الشهادة
+  type        CertificationType  // نوع الشهادة
+  issuer      String?            // الجهة المصدرة
+  year        Int?               // سنة الحصول
+  fileUrl     String?            // رابط وثيقة الشهادة
+  description String?            // وصف إضافي
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("certifications")
+}
+
+// ========== التصنيفات (الرياضات والمجالات) ==========
+model Category {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  nameArabic  String
+  description String?
+  icon        String?  // icon name from lucide-react
+  slug        String   @unique
+  order       Int      @default(0)
+  parentId    String?
+  parent      Category?        @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[]       @relation("CategoryHierarchy")
+  competencies Competency[]
+  specialties  Specialty[]
+  libraryResources LibraryResource[]
+  innovations  Innovation[]
+  articles     Article[]
+
+  @@map("categories")
+}
+
+// ========== مجالات الاختصاص ==========
+model Specialty {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  name        String
+  nameArabic  String
+  description String?
+  slug        String   @unique
+  icon        String?
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  competencies Competency[]
+
+  @@map("specialties")
+}
+
+// ========== الكفاءات (ربط المختصين بالتصنيفات) ==========
+model Competency {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  specialtyId String?
+  specialty   Specialty? @relation(fields: [specialtyId], references: [id])
+
+  description String?  // وصف إضافي للاختصاص
+  isMain      Boolean @default(false) // الاختصاص الرئيسي
+  isVerified  Boolean @default(false) // تم التحقق منه
+
+  @@unique([userId, specialtyId])
+  @@map("competencies")
+}
+
+// ========== المكتبة الرقمية ==========
+model LibraryResource {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  titleArabic String?
+  description String?
+  type        ResourceType
+  fileUrl     String?
+  coverUrl    String?
+  author      String?
+  authorId    String?
+  authorUser  User?    @relation(fields: [authorId], references: [id])
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  tags        String?  // JSON array
+  isPublished Boolean  @default(false)
+  downloads   Int      @default(0)
+  views       Int      @default(0)
+
+  @@map("library_resources")
+}
+
+enum ResourceType {
+  BOOK
+  RESEARCH
+  THESIS
+  ARTICLE
+  TRAINING_PROGRAM
+  PDF
+  VIDEO
+
+  @@map("resource_types")
+}
+
+// ========== فضاء الابتكار ==========
+model Innovation {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  titleArabic String?
+  description String
+  content     String?  // محتوى مفصل
+  imageUrl    String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  tags        String?  // JSON array
+  isApproved  Boolean  @default(false)
+  likes       Int      @default(0)
+
+  @@map("innovations")
+}
+
+// ========== المقالات (مجلة مدربي DZ) ==========
+model Article {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  titleArabic String?
+  slug        String   @unique
+  excerpt     String?
+  content     String   // Markdown content
+  coverImage  String?
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  tags        String?  // JSON array
+  isPublished Boolean  @default(false)
+  views       Int      @default(0)
+  likes       Int      @default(0)
+
+  @@map("articles")
+}
+
+// ========== التقييمات ==========
+model Review {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  rating    Int      // 1-5
+  comment   String?
+  reviewerId String
+  reviewer  User     @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  targetId  String
+  target    User     @relation("Target", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewerId, targetId])
+  @@map("reviews")
+}
+
+// ========== الرسائل ==========
+model Message {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  content    String
+  isRead     Boolean  @default(false)
+  senderId   String
+  sender     User     @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User     @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+// ========== الجلسات (NextAuth) ==========
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+// ========== الندوات والدروس (Zoom/Webinars) ==========
+model Webinar {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  titleArabic String?
+  description String
+  presenter   String   // اسم المقدم
+  presenterBio String? // نبذة عن المقدم
+  date        DateTime // تاريخ الندوة
+  duration    Int?     // المدة بالدقائق
+  zoomLink    String?  // رابط Zoom
+  videoUrl    String?  // رابط التسجيل (YouTube/Vimeo)
+  thumbnail   String?  // صورة مصغرة
+  category    String?  // تصنيف الندوة
+  tags        String?  // JSON array
+  isLive      Boolean  @default(false) // هل هي مباشرة الآن؟
+  isPublished Boolean  @default(true)
+  views       Int      @default(0)
+  maxAttendees Int?    // أقصى عدد للحضور
+  createdById String?
+  createdBy   User?    @relation("WebinarCreator", fields: [createdById], references: [id])
+
+  @@map("webinars")
+}
+
+// ========== رسائل الاتصال (نموذج اتصل بنا) ==========
+model ContactMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  name      String
+  email     String
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+
+  @@map("contact_messages")
+}
