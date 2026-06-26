@@ -66,10 +66,10 @@ export default async function ProfilePage() {
               )}
             </div>
           </div>
-          <Link href="/profile/edit" className="group relative">
-            <Button variant="outline" size="sm" className="gap-2">
+          <Link href="/profile/edit" className="group relative shrink-0">
+            <Button variant="outline" size="sm" className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 font-bold">
               <Pencil className="h-4 w-4" />
-              تعديل الملف
+              ✏️ تعديل الملف
             </Button>
           </Link>
         </div>
@@ -87,6 +87,16 @@ export default async function ProfilePage() {
               <div className="text-xs text-gray-500">{stat.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Edit Profile Link */}
+        <div className="mt-6 text-center">
+          <Link href="/profile/edit">
+            <Button variant="outline" size="sm" className="gap-2 border-emerald-300 text-emerald-700 font-bold">
+              <Pencil className="h-4 w-4" />
+              ✏️ تعديل الملف الشخصي
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
