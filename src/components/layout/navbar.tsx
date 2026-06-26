@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Menu, X, Search, User, LogOut, BookOpen, Lightbulb, Newspaper, MessageCircle, Mail, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -20,6 +20,18 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<{ name: string; nameArabic?: string; email: string; role: string; avatar?: string; title?: string } | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.user) setUser(data.user)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -55,17 +67,36 @@ export function Navbar() {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex md:items-center md:gap-2">
-            <Link href="/auth/login">
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <User className="h-4 w-4" />
-                دخول
-              </Button>
-            </Link>
-            <Link href="/auth/signup">
-              <Button size="sm" className="gap-1.5">
-                تسجيل
-              </Button>
-            </Link>
+            {loading ? null : user ? (
+              <>
+                <Link href="/profile">
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <User className="h-4 w-4" />
+                    {user.nameArabic || user.name}
+                  </Button>
+                </Link>
+                <Link href="/api/auth/logout">
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-red-500 hover:text-red-700 hover:bg-red-50">
+                    <LogOut className="h-4 w-4" />
+                    خروج
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <User className="h-4 w-4" />
+                    دخول
+                  </Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button size="sm" className="gap-1.5">
+                    تسجيل
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -97,21 +128,32 @@ export function Navbar() {
             <span className="text-xs text-gray-500 dark:text-gray-400">المظهر</span>
             <DarkModeToggle />
           </div>
-          <Link
-            href="/auth/login"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50"
-          >
-            <User className="h-4 w-4" />
-            دخول
-          </Link>
-          <Link
-            href="/auth/signup"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
-          >
-            تسجيل جديد
-          </Link>
+          {user ? (
+            <>
+              <Link href="/profile" onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50">
+                <User className="h-4 w-4" />
+                {user.nameArabic || user.name}
+              </Link>
+              <Link href="/api/auth/logout" onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">
+                <LogOut className="h-4 w-4" />
+                خروج
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50">
+                <User className="h-4 w-4" />
+                دخول
+              </Link>
+              <Link href="/auth/signup" onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700">
+                تسجيل جديد
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
