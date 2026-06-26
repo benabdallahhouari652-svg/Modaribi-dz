@@ -6,6 +6,8 @@ import { markAsRead } from '@/lib/actions/messages'
 import { MessageSquare, Reply, Trash2, Mail, MailOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+export const dynamic = 'force-dynamic'
+
 export default async function InboxPage() {
   const currentUser = await getCurrentUser()
   if (!currentUser) redirect('/auth/login')

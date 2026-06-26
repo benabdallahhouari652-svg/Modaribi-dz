@@ -5,6 +5,8 @@ import { BookOpen, Download, FileText, Plus, Trash2, Upload } from 'lucide-react
 import { Button } from '@/components/ui/button'
 import { LibraryUploadForm } from '@/components/library/upload-form'
 
+export const dynamic = 'force-dynamic'
+
 async function getBooks() {
   return await prisma.libraryResource.findMany({
     where: { isPublished: true, type: 'BOOK' },

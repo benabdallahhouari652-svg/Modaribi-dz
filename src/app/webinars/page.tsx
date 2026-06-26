@@ -4,6 +4,8 @@ import { Video, Calendar, Clock, Eye, Users, Play, Plus, Monitor } from 'lucide-
 import { Button } from '@/components/ui/button'
 import { getCurrentUser } from '@/lib/dal'
 
+export const dynamic = 'force-dynamic'
+
 export default async function WebinarsPage() {
   const [webinars, currentUser] = await Promise.all([
     prisma.webinar.findMany({

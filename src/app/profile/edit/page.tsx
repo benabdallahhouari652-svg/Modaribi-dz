@@ -5,6 +5,8 @@ import { ProfileEditForm } from '@/components/profile/edit-form'
 import { CertificationsManager } from '@/components/profile/certifications-manager'
 import { CompetenciesManager } from '@/components/profile/competencies-manager'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ProfileEditPage() {
   const currentUser = await getCurrentUser()
   if (!currentUser) redirect('/auth/login')
