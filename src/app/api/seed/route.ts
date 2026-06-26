@@ -76,10 +76,11 @@ export async function GET() {
     for (const spec of SPECIALTIES) {
       const category = await prisma.category.findUnique({ where: { slug: spec.categorySlug } })
       if (category) {
+        const { categorySlug, ...specData } = spec
         await prisma.specialty.upsert({
           where: { slug: spec.slug },
-          update: { ...spec, categoryId: category.id },
-          create: { ...spec, categoryId: category.id },
+          update: { ...specData, categoryId: category.id },
+          create: { ...specData, categoryId: category.id },
         })
       }
     }
