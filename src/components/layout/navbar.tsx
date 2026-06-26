@@ -20,7 +20,7 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [user, setUser] = useState<{ name: string; nameArabic?: string; email: string; role: string; avatar?: string; title?: string } | null>(null)
+  const [user, setUser] = useState<{ name: string; surname?: string; email: string; role: string; avatar?: string; title?: string } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export function Navbar() {
                 <Link href="/profile">
                   <Button variant="outline" size="sm" className="gap-1.5">
                     <User className="h-4 w-4" />
-                    {user.nameArabic || user.name}
+                    {user.surname ? user.surname + ' ' + user.name : user.name}
                   </Button>
                 </Link>
                 <Link href="/api/auth/logout">
@@ -133,7 +133,7 @@ export function Navbar() {
               <Link href="/profile" onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50">
                 <User className="h-4 w-4" />
-                {user.nameArabic || user.name}
+                {user.surname ? user.surname + ' ' + user.name : user.name}
               </Link>
               <Link href="/api/auth/logout" onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">
