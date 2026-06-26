@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { Menu, X, Search, User, LogOut, BookOpen, Lightbulb, Newspaper, MessageCircle, Mail, Monitor } from 'lucide-react'
+import { Menu, X, Search, User, LogOut, BookOpen, Lightbulb, Newspaper, MessageCircle, Mail, Monitor, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DarkModeToggle } from '@/components/theme/dark-mode-toggle'
@@ -69,10 +69,10 @@ export function Navbar() {
           <div className="hidden md:flex md:items-center md:gap-2">
             {loading ? null : user ? (
               <>
-                <Link href="/profile">
-                  <Button variant="outline" size="sm" className="gap-1.5">
-                    <User className="h-4 w-4" />
-                    {user.surname ? user.surname + ' ' + user.name : user.name}
+                <Link href="/profile/edit">
+                  <Button variant="default" size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
+                    <Pencil className="h-4 w-4" />
+                    تعديل
                   </Button>
                 </Link>
                 <Link href="/api/auth/logout">
@@ -130,10 +130,10 @@ export function Navbar() {
           </div>
           {user ? (
             <>
-              <Link href="/profile" onClick={() => setIsOpen(false)}
+              <Link href="/profile/edit" onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50">
                 <User className="h-4 w-4" />
-                {user.surname ? user.surname + ' ' + user.name : user.name}
+                تعديل الملف الشخصي
               </Link>
               <Link href="/api/auth/logout" onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">
