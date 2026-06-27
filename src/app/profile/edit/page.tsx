@@ -4,6 +4,8 @@ import { getCurrentUser } from '@/lib/dal'
 import { ProfileEditForm } from '@/components/profile/edit-form'
 import { CertificationsManager } from '@/components/profile/certifications-manager'
 import { CompetenciesManager } from '@/components/profile/competencies-manager'
+import { AlertCircle, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,44 +13,72 @@ export default async function ProfileEditPage() {
   const currentUser = await getCurrentUser()
   if (!currentUser) redirect('/auth/login')
 
-  const [user, certifications, competencies, specialties] = await Promise.all([
-    prisma.user.findUnique({ where: { id: currentUser.id } }),
-    prisma.certification.findMany({
-      where: { userId: currentUser.id },
-      orderBy: { year: 'desc' },
-    }),
-    prisma.competency.findMany({
-      where: { userId: currentUser.id },
-      include: {
-        specialty: { select: { name: true, nameArabic: true } },
-        category: { select: { name: true, nameArabic: true } },
-      },
-    }),
-    prisma.specialty.findMany({
-      include: { category: { select: { nameArabic: true, name: true } } },
-      orderBy: { name: 'asc' },
-    }),
-  ])
+  try {
+    const [user, certifications, competencies, specialties] = await Promise.all([
+      prisma.user.findUnique({ where: { id: currentUser.id } }),
+      prisma.certification.findMany({
+        where: { userId: currentUser.id },
+        orderBy: { year: 'desc' },
+      }),
+      prisma.competency.findMany({
+        where: { userId: currentUser.id },
+        include: {
+          specialty: { select: { name: true, nameArabic: true } },
+          category: { select: { name: true, nameArabic: true } },
+        },
+      }),
+      prisma.specialty.findMany({
+        include: { category: { select: { nameArabic: true, name: true } } },
+        orderBy: { name: 'asc' },
+      }),
+    ])
 
-  if (!user) redirect('/auth/login')
+    if (!user) redirect('/auth/login')
 
-  return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">تعديل الملف الشخصي</h1>
-        <p className="mt-1 text-gray-600">قم بتحديث معلوماتك المهنية والشخصية</p>
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">تعديل الملف الشخصي</h1>
+          <p className="mt-1 text-gray-600">قم بتحديث معلوماتك المهنية والشخصية</p>
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-white p-8 space-y-8">
+          <ProfileEditForm user={user} />
+
+          <hr className="border-gray-200" />
+
+          <CompetenciesManager competencies={competencies} specialties={specialties} />
+
+          <hr className="border-gray-200" />
+
+          <CertificationsManager certifications={certifications} />
+        </div>
       </div>
-      <div className="rounded-xl border border-gray-200 bg-white p-8 space-y-8">
-        <ProfileEditForm user={user} />
-
-        <hr className="border-gray-200" />
-
-        <CompetenciesManager competencies={competencies} specialties={specialties} />
-
-        <hr className="border-gray-200" />
-
-        <CertificationsManager certifications={certifications} />
+    )
+  } catch (error) {
+    console.error('Profile edit page error:', error)
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
+          <h2 className="mt-4 text-xl font-bold text-red-700">حدث خطأ</h2>
+          <p className="mt-2 text-red-600">
+            عذراً، حدث خطأ أثناء تحميل صفحة التعديل. قد يكون هناك مشكلة في الاتصال بقاعدة البيانات.
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <Link href="/profile/edit">
+              <button className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+                <RefreshCw className="h-4 w-4" />
+                إعادة المحاولة
+              </button>
+            </Link>
+            <Link href="/profile">
+              <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                الرجوع للبروفيل
+              </button>
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
