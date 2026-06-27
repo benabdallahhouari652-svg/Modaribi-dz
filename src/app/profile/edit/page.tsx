@@ -1,87 +1,50 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
+import { getCurrentUser } from '@/lib/dal'
 import { ProfileEditForm } from '@/components/profile/edit-form'
 import { CertificationsManager } from '@/components/profile/certifications-manager'
 import { CompetenciesManager } from '@/components/profile/competencies-manager'
-import { Loader2, AlertCircle } from 'lucide-react'
 
-export default function ProfileEditPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [data, setData] = useState<{
-    certifications: any[]
-    competencies: any[]
-    specialties: any[]
-  } | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+export const dynamic = 'force-dynamic'
 
-  useEffect(() => {
-    let cancelled = false
+export default async function ProfileEditPage() {
+  const currentUser = await getCurrentUser()
+  if (!currentUser) redirect('/auth/login')
 
-    async function loadData() {
-      try {
-        // Check auth first
-        const authRes = await fetch('/api/auth/me')
-        const authData = await authRes.json()
-        if (!authData?.user) {
-          router.push('/auth/login')
-          return
-        }
+  const [user, certifications, competencies, specialties] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: currentUser.id },
+      select: {
+        id: true, name: true, surname: true, nameArabic: true,
+        email: true, role: true, avatar: true, bio: true, cv: true,
+        phone: true, whatsapp: true, wilaya: true, municipality: true,
+        maritalStatus: true, gender: true, title: true, experienceYears: true,
+        languages: true, ageGroupTarget: true, trainingType: true,
+        isContracted: true, acceptsRemoteWork: true, acceptsTravel: true, acceptsWorkOutside: true,
+        website: true, facebook: true, instagram: true, youtube: true, linkedin: true,
+        createdAt: true, updatedAt: true, isActive: true,
+        ratingAvg: true, ratingCount: true, availability: true,
+        passwordHash: true,
+      },
+    }),
+    prisma.certification.findMany({
+      where: { userId: currentUser.id },
+      orderBy: { year: 'desc' },
+    }),
+    prisma.competency.findMany({
+      where: { userId: currentUser.id },
+      include: {
+        specialty: { select: { name: true, nameArabic: true } },
+        category: { select: { name: true, nameArabic: true } },
+      },
+    }),
+    prisma.specialty.findMany({
+      include: { category: { select: { nameArabic: true, name: true } } },
+      orderBy: { name: 'asc' },
+    }),
+  ])
 
-        // Fetch edit page data
-        const res = await fetch('/api/profile/edit-data')
-        const json = await res.json()
-        if (!json.success) {
-          setError(json.error || 'فشل تحميل البيانات')
-          return
-        }
-        if (cancelled) return
-        setUser(json.user)
-        setData({
-          certifications: json.certifications,
-          competencies: json.competencies,
-          specialties: json.specialties,
-        })
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'حدث خطأ في الاتصال')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    loadData()
-    return () => { cancelled = true }
-  }, [router])
-
-  if (loading) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <Loader2 className="mx-auto h-8 w-8 animate-spin text-emerald-600" />
-        <p className="mt-4 text-gray-500">جاري التحميل...</p>
-      </div>
-    )
-  }
-
-  if (error || !user) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
-          <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
-          <h2 className="mt-4 text-xl font-bold text-red-700">حدث خطأ</h2>
-          <p className="mt-2 text-red-600">{error || 'عذراً، حدث خطأ أثناء تحميل صفحة التعديل.'}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-          >
-            إعادة المحاولة
-          </button>
-        </div>
-      </div>
-    )
-  }
+  if (!user) redirect('/auth/login')
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -91,14 +54,14 @@ export default function ProfileEditPage() {
       </div>
       <div className="rounded-xl border border-gray-200 bg-white p-8 space-y-8">
         <ProfileEditForm user={user} />
+
         <hr className="border-gray-200" />
-        {data && (
-          <CompetenciesManager competencies={data.competencies} specialties={data.specialties} />
-        )}
+
+        <CompetenciesManager competencies={competencies} specialties={specialties} />
+
         <hr className="border-gray-200" />
-        {data && (
-          <CertificationsManager certifications={data.certifications} />
-        )}
+
+        <CertificationsManager certifications={certifications} />
       </div>
     </div>
   )

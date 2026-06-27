@@ -8,19 +8,19 @@ import { revalidatePath } from 'next/cache'
 
 const ProfileSchema = z.object({
   name: z.string().min(2, 'الاسم يجب أن يكون على الأقل حرفين').trim(),
-  surname: z.string().optional().nullable(),
-  nameArabic: z.string().optional().nullable(),
-  avatar: z.string().optional().nullable(),
-  title: z.string().optional().nullable(),
-  bio: z.string().optional().nullable(),
-  cv: z.string().optional().nullable(),
-  phone: z.string().optional().nullable(),
-  whatsapp: z.string().optional().nullable(),
-  wilaya: z.string().optional().nullable(),
-  municipality: z.string().optional().nullable(),
-  experienceYears: z.coerce.number().optional().nullable(),
-  languages: z.string().optional().nullable(),
-  ageGroupTarget: z.string().optional().nullable(),
+  surname: z.string().optional(),
+  nameArabic: z.string().optional(),
+  avatar: z.string().optional(),
+  title: z.string().optional(),
+  bio: z.string().optional(),
+  cv: z.string().optional(),
+  phone: z.string().optional(),
+  whatsapp: z.string().optional(),
+  wilaya: z.string().optional(),
+  municipality: z.string().optional(),
+  experienceYears: z.coerce.number().optional(),
+  languages: z.string().optional(),
+  ageGroupTarget: z.string().optional(),
   trainingType: z.enum(['INDIVIDUAL', 'GROUP', 'BOTH']).optional().nullable(),
   maritalStatus: z.enum(['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED']).optional().nullable(),
   gender: z.enum(['MALE', 'FEMALE']).optional().nullable(),
@@ -28,11 +28,11 @@ const ProfileSchema = z.object({
   acceptsRemoteWork: z.boolean().optional(),
   acceptsTravel: z.boolean().optional(),
   acceptsWorkOutside: z.boolean().optional(),
-  website: z.string().optional().nullable(),
-  facebook: z.string().optional().nullable(),
-  instagram: z.string().optional().nullable(),
-  youtube: z.string().optional().nullable(),
-  linkedin: z.string().optional().nullable(),
+  website: z.string().optional(),
+  facebook: z.string().optional(),
+  instagram: z.string().optional(),
+  youtube: z.string().optional(),
+  linkedin: z.string().optional(),
 })
 
 export type ProfileFormState = {
@@ -47,44 +47,36 @@ export async function updateProfile(prevState: ProfileFormState, formData: FormD
     return { message: 'يجب تسجيل الدخول أولاً', success: false }
   }
 
-  // Helper: empty string → null (clear field), non-empty → value
-  const val = (key: string) => {
-    const v = formData.get(key)
-    if (v === '' || v === null) return null
-    return v as string
-  }
-
   const rawData: Record<string, any> = {
     name: formData.get('name'),
-    surname: val('surname'),
-    nameArabic: val('nameArabic'),
-    avatar: val('avatar'),
-    title: val('title'),
-    bio: val('bio'),
-    cv: val('cv'),
-    phone: val('phone'),
-    whatsapp: val('whatsapp'),
-    wilaya: val('wilaya'),
-    municipality: val('municipality'),
-    experienceYears: val('experienceYears') !== null ? Number(val('experienceYears')) || null : null,
-    languages: val('languages'),
-    ageGroupTarget: val('ageGroupTarget'),
-    trainingType: val('trainingType'),
-    maritalStatus: val('maritalStatus'),
-    gender: val('gender'),
+    surname: formData.get('surname') || undefined,
+    nameArabic: formData.get('nameArabic') || undefined,
+    avatar: formData.get('avatar') || undefined,
+    title: formData.get('title') || undefined,
+    bio: formData.get('bio') || undefined,
+    cv: formData.get('cv') || undefined,
+    phone: formData.get('phone') || undefined,
+    whatsapp: formData.get('whatsapp') || undefined,
+    wilaya: formData.get('wilaya') || undefined,
+    municipality: formData.get('municipality') || undefined,
+    experienceYears: formData.get('experienceYears') ? Number(formData.get('experienceYears')) : undefined,
+    languages: formData.get('languages') || undefined,
+    ageGroupTarget: formData.get('ageGroupTarget') || undefined,
+    trainingType: formData.get('trainingType') || undefined,
+    maritalStatus: formData.get('maritalStatus') || undefined,
+    gender: formData.get('gender') || undefined,
     isContracted: formData.get('isContracted') === 'true',
     acceptsRemoteWork: formData.get('acceptsRemoteWork') === 'true',
     acceptsTravel: formData.get('acceptsTravel') === 'true',
     acceptsWorkOutside: formData.get('acceptsWorkOutside') === 'true',
-    website: val('website'),
-    facebook: val('facebook'),
-    instagram: val('instagram'),
-    youtube: val('youtube'),
-    linkedin: val('linkedin'),
+    website: formData.get('website') || undefined,
+    facebook: formData.get('facebook') || undefined,
+    instagram: formData.get('instagram') || undefined,
+    youtube: formData.get('youtube') || undefined,
+    linkedin: formData.get('linkedin') || undefined,
   }
 
-  // Keep null values so Prisma sets them to null (clearing the field in DB)
-  // Only filter out undefined values (which don't occur in structured form data)
+  // Remove undefined fields so Prisma doesn't overwrite with null
   const cleanData = Object.fromEntries(
     Object.entries(rawData).filter(([_, v]) => v !== undefined)
   )
