@@ -69,7 +69,7 @@ export function Navbar() {
           <div className="hidden md:flex md:items-center md:gap-2">
             {loading ? null : user ? (
               <>
-                <Link href="/profile/edit">
+                <Link href="/profile/edit" prefetch={false}>
                   <Button variant="default" size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
                     <Pencil className="h-4 w-4" />
                     تعديل
@@ -130,7 +130,7 @@ export function Navbar() {
           </div>
           {user ? (
             <>
-              <Link href="/profile/edit" onClick={() => setIsOpen(false)}
+              <Link href="/profile/edit" prefetch={false} onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50">
                 <User className="h-4 w-4" />
                 تعديل الملف الشخصي
