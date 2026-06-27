@@ -9,7 +9,7 @@ const protectedRoutes = [
   '/library/upload',
 ]
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const session = request.cookies.get('session')?.value
   const { pathname } = request.nextUrl
 

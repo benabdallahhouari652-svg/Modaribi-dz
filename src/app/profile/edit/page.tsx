@@ -56,11 +56,11 @@ export default async function ProfileEditPage() {
       </div>
     )
   } catch (error) {
-    // Re-throw Next.js redirect/navigation errors so they work properly
+    // Re-throw Next.js redirect errors so they propagate properly
     if (error instanceof Error && (
+      (error as any).digest?.startsWith('NEXT_REDIRECT') ||
       error.message?.includes('NEXT_REDIRECT') ||
-      error.message?.includes('redirect') ||
-      error.digest?.startsWith('NEXT_REDIRECT')
+      error.message?.includes('redirect')
     )) {
       throw error
     }
