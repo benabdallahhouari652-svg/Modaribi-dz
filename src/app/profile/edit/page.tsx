@@ -10,12 +10,16 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export default async function ProfileEditPage() {
+  // ✅ Auth check OUTSIDE try/catch — redirect works properly
   const currentUser = await getCurrentUser()
   if (!currentUser) redirect('/auth/login')
 
+  // ✅ Data fetching IN try/catch — errors handled gracefully
   try {
-    const [user, certifications, competencies, specialties] = await Promise.all([
-      prisma.user.findUnique({ where: { id: currentUser.id } }),
+    const user = await prisma.user.findUnique({ where: { id: currentUser.id } })
+    if (!user) redirect('/auth/login')
+
+    const [certifications, competencies, specialties] = await Promise.all([
       prisma.certification.findMany({
         where: { userId: currentUser.id },
         orderBy: { year: 'desc' },
@@ -32,8 +36,6 @@ export default async function ProfileEditPage() {
         orderBy: { name: 'asc' },
       }),
     ])
-
-    if (!user) redirect('/auth/login')
 
     return (
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -65,16 +67,18 @@ export default async function ProfileEditPage() {
             عذراً، حدث خطأ أثناء تحميل صفحة التعديل. قد يكون هناك مشكلة في الاتصال بقاعدة البيانات.
           </p>
           <div className="mt-6 flex items-center justify-center gap-3">
-            <Link href="/profile/edit">
-              <button className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
-                <RefreshCw className="h-4 w-4" />
-                إعادة المحاولة
-              </button>
+            <Link
+              href="/profile/edit"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+            >
+              <RefreshCw className="h-4 w-4" />
+              إعادة المحاولة
             </Link>
-            <Link href="/profile">
-              <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                الرجوع للبروفيل
-              </button>
+            <Link
+              href="/profile"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              الرجوع للبروفيل
             </Link>
           </div>
         </div>
