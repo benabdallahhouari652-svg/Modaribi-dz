@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ProfileEditForm } from '@/components/profile/edit-form'
 import { CertificationsManager } from '@/components/profile/certifications-manager'
 import { CompetenciesManager } from '@/components/profile/competencies-manager'
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertCircle } from 'lucide-react'
 
 export default function ProfileEditPage() {
   const router = useRouter()
@@ -15,14 +15,17 @@ export default function ProfileEditPage() {
     competencies: any[]
     specialties: any[]
   } | null>(null)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check auth first
-    fetch('/api/auth/me')
-      .then(r => r.json())
-      .then(async (authData) => {
+    let cancelled = false
+
+    async function loadData() {
+      try {
+        // Check auth first
+        const authRes = await fetch('/api/auth/me')
+        const authData = await authRes.json()
         if (!authData?.user) {
           router.push('/auth/login')
           return
@@ -32,20 +35,25 @@ export default function ProfileEditPage() {
         const res = await fetch('/api/profile/edit-data')
         const json = await res.json()
         if (!json.success) {
-          setError(true)
+          setError(json.error || 'فشل تحميل البيانات')
           return
         }
+        if (cancelled) return
         setUser(json.user)
         setData({
           certifications: json.certifications,
           competencies: json.competencies,
           specialties: json.specialties,
         })
-      })
-      .catch(() => {
-        setError(true)
-      })
-      .finally(() => setLoading(false))
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'حدث خطأ في الاتصال')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    loadData()
+    return () => { cancelled = true }
   }, [router])
 
   if (loading) {
@@ -59,10 +67,11 @@ export default function ProfileEditPage() {
 
   if (error || !user) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-8 text-center">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-8">
-          <h2 className="text-xl font-bold text-red-700">حدث خطأ</h2>
-          <p className="mt-2 text-red-600">عذراً، حدث خطأ أثناء تحميل صفحة التعديل.</p>
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
+          <h2 className="mt-4 text-xl font-bold text-red-700">حدث خطأ</h2>
+          <p className="mt-2 text-red-600">{error || 'عذراً، حدث خطأ أثناء تحميل صفحة التعديل.'}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
