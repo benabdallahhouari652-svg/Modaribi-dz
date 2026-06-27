@@ -10,11 +10,10 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export default async function ProfileEditPage() {
-  // ✅ Auth check OUTSIDE try/catch — redirect works properly
+  // ✅ Auth check
   const currentUser = await getCurrentUser()
   if (!currentUser) redirect('/auth/login')
 
-  // ✅ Data fetching IN try/catch — errors handled gracefully
   try {
     const user = await prisma.user.findUnique({ where: { id: currentUser.id } })
     if (!user) redirect('/auth/login')
@@ -57,6 +56,15 @@ export default async function ProfileEditPage() {
       </div>
     )
   } catch (error) {
+    // Re-throw Next.js redirect/navigation errors so they work properly
+    if (error instanceof Error && (
+      error.message?.includes('NEXT_REDIRECT') ||
+      error.message?.includes('redirect') ||
+      error.digest?.startsWith('NEXT_REDIRECT')
+    )) {
+      throw error
+    }
+
     console.error('Profile edit page error:', error)
     return (
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -64,7 +72,7 @@ export default async function ProfileEditPage() {
           <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
           <h2 className="mt-4 text-xl font-bold text-red-700">حدث خطأ</h2>
           <p className="mt-2 text-red-600">
-            عذراً، حدث خطأ أثناء تحميل صفحة التعديل. قد يكون هناك مشكلة في الاتصال بقاعدة البيانات.
+            عذراً، حدث خطأ أثناء تحميل صفحة التعديل. يرجى المحاولة مرة أخرى.
           </p>
           <div className="mt-6 flex items-center justify-center gap-3">
             <Link
