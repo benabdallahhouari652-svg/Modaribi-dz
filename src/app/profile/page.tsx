@@ -13,11 +13,17 @@ export default async function ProfilePage() {
 
   const fullProfile = await prisma.user.findUnique({
     where: { id: currentUser.id },
-    include: {
+    select: {
+      id: true, name: true, surname: true, nameArabic: true,
+      email: true, role: true, avatar: true, bio: true,
+      phone: true, whatsapp: true, wilaya: true, municipality: true,
+      title: true, experienceYears: true,
+      ratingAvg: true, ratingCount: true,
       competencies: {
-        include: {
-          category: true,
-          specialty: true,
+        select: {
+          id: true, isMain: true, isVerified: true,
+          specialty: { select: { name: true, nameArabic: true } },
+          category: { select: { name: true, nameArabic: true } },
         },
       },
       _count: {
