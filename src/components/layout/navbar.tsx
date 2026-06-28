@@ -6,6 +6,7 @@ import { Menu, X, Search, User, LogOut, BookOpen, Lightbulb, Newspaper, MessageC
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { DarkModeToggle } from '@/components/theme/dark-mode-toggle'
+import { NotificationBell } from '@/components/notifications/notification-bell'
 
 const navLinks = [
   { href: '/', label: 'الرئيسية', icon: null },
@@ -60,8 +61,9 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Theme Toggle */}
-          <div className="hidden md:flex md:items-center">
+          {/* Notifications + Theme Toggle */}
+          <div className="hidden md:flex md:items-center md:gap-1">
+            {user && <NotificationBell />}
             <DarkModeToggle />
           </div>
 
@@ -124,6 +126,12 @@ export function Navbar() {
             </Link>
           ))}
           <hr className="my-2 border-gray-200 dark:border-gray-700" />
+          {user && (
+            <div className="flex items-center justify-between px-2 py-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400">الإشعارات</span>
+              <NotificationBell />
+            </div>
+          )}
           <div className="flex items-center justify-between px-2 py-2">
             <span className="text-xs text-gray-500 dark:text-gray-400">المظهر</span>
             <DarkModeToggle />
