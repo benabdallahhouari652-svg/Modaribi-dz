@@ -114,39 +114,69 @@ export default async function SpecialistProfilePage(props: { params: PageParams 
 
             <div className="mt-6 space-y-3 text-right">
               {specialist.email && (
-                <p className="flex items-center gap-2 text-sm text-gray-600" dir="ltr">
+                <p className="flex items-center gap-2 text-sm text-gray-600 group" dir="ltr">
                   <Mail className="h-4 w-4 shrink-0" />
                   {specialist.email}
+                  {isOwner && (
+                    <Link href="/profile/edit" className="inline-flex opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Pencil className="h-3 w-3 text-emerald-400 hover:text-emerald-600" />
+                    </Link>
+                  )}
                 </p>
               )}
               {specialist.wilaya && (
-                <p className="flex items-center gap-2 text-sm text-gray-600">
+                <p className="flex items-center gap-2 text-sm text-gray-600 group">
                   <MapPin className="h-4 w-4 shrink-0" />
                   {specialist.wilaya}{specialist.municipality ? ` - ${specialist.municipality}` : ''}
+                  {isOwner && (
+                    <Link href="/profile/edit" className="inline-flex opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Pencil className="h-3 w-3 text-emerald-400 hover:text-emerald-600" />
+                    </Link>
+                  )}
                 </p>
               )}
               {specialist.phone && (
-                <p className="flex items-center gap-2 text-sm text-gray-600" dir="ltr">
+                <p className="flex items-center gap-2 text-sm text-gray-600 group" dir="ltr">
                   <Phone className="h-4 w-4 shrink-0" />
                   {specialist.phone}
+                  {isOwner && (
+                    <Link href="/profile/edit" className="inline-flex opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Pencil className="h-3 w-3 text-emerald-400 hover:text-emerald-600" />
+                    </Link>
+                  )}
                 </p>
               )}
               {specialist.experienceYears && (
-                <p className="flex items-center gap-2 text-sm text-gray-600">
+                <p className="flex items-center gap-2 text-sm text-gray-600 group">
                   <Award className="h-4 w-4 shrink-0" />
                   {specialist.experienceYears} سنة خبرة
+                  {isOwner && (
+                    <Link href="/profile/edit" className="inline-flex opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Pencil className="h-3 w-3 text-emerald-400 hover:text-emerald-600" />
+                    </Link>
+                  )}
                 </p>
               )}
               {specialist.maritalStatus && (
-                <p className="flex items-center gap-2 text-sm text-gray-600">
+                <p className="flex items-center gap-2 text-sm text-gray-600 group">
                   <Heart className="h-4 w-4 shrink-0" />
                   {maritalStatusLabels[specialist.maritalStatus] || specialist.maritalStatus}
+                  {isOwner && (
+                    <Link href="/profile/edit" className="inline-flex opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Pencil className="h-3 w-3 text-emerald-400 hover:text-emerald-600" />
+                    </Link>
+                  )}
                 </p>
               )}
               {specialist.gender && (
-                <p className="flex items-center gap-2 text-sm text-gray-600">
+                <p className="flex items-center gap-2 text-sm text-gray-600 group">
                   <User className="h-4 w-4 shrink-0" />
                   {genderLabels[specialist.gender] || specialist.gender}
+                  {isOwner && (
+                    <Link href="/profile/edit" className="inline-flex opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Pencil className="h-3 w-3 text-emerald-400 hover:text-emerald-600" />
+                    </Link>
+                  )}
                 </p>
               )}
             </div>

@@ -51,26 +51,39 @@ export default async function ProfilePage() {
             )}
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               {fullProfile.nameArabic || `${fullProfile.surname ? fullProfile.surname + ' ' : ''}${fullProfile.name}`}
+              <Link href="/profile/edit" className="inline-flex items-center gap-1 rounded-lg p-1.5 text-emerald-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="تعديل الاسم">
+                <Pencil className="h-3.5 w-3.5" />
+              </Link>
             </h1>
-            {fullProfile.title && <p className="mt-1 text-gray-600">{fullProfile.title}</p>}
+            {fullProfile.title && (
+              <p className="mt-1 text-gray-600 flex items-center gap-2">
+                {fullProfile.title}
+                <Link href="/profile/edit" className="inline-flex items-center gap-1 rounded-lg p-1 text-emerald-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all opacity-0 hover:opacity-100" title="تعديل المسمى">
+                  <Pencil className="h-3 w-3" />
+                </Link>
+              </p>
+            )}
             <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500">
-              <span className="flex items-center gap-1">
+              <Link href="/profile/edit" className="flex items-center gap-1 group rounded-lg px-2 py-1 -mx-2 hover:bg-emerald-50 transition-colors" title="تعديل البريد الإلكتروني">
                 <Mail className="h-4 w-4" />
-                {fullProfile.email}
-              </span>
+                <span>{fullProfile.email}</span>
+                <Pencil className="h-3 w-3 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Link>
               {fullProfile.wilaya && (
-                <span className="flex items-center gap-1">
+                <Link href="/profile/edit" className="flex items-center gap-1 group rounded-lg px-2 py-1 -mx-2 hover:bg-emerald-50 transition-colors" title="تعديل الولاية">
                   <MapPin className="h-4 w-4" />
-                  {fullProfile.wilaya}
-                </span>
+                  <span>{fullProfile.wilaya}</span>
+                  <Pencil className="h-3 w-3 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
               )}
               {fullProfile.phone && (
-                <span className="flex items-center gap-1">
+                <Link href="/profile/edit" className="flex items-center gap-1 group rounded-lg px-2 py-1 -mx-2 hover:bg-emerald-50 transition-colors" title="تعديل رقم الهاتف">
                   <Phone className="h-4 w-4" />
-                  {fullProfile.phone}
-                </span>
+                  <span>{fullProfile.phone}</span>
+                  <Pencil className="h-3 w-3 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
               )}
             </div>
           </div>
