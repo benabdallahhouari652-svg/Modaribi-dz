@@ -24,7 +24,6 @@ export type FormState = {
     password?: string[]
   }
   message?: string
-  success?: boolean
 } | undefined
 
 export async function signup(state: FormState, formData: FormData) {

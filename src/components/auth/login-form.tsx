@@ -11,7 +11,7 @@ export function LoginForm() {
 
   return (
     <form action={action} className="space-y-5">
-      {state?.message && !state?.success && (
+      {state?.message && (
         <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
           {state.message}
         </div>
