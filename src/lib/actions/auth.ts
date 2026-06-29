@@ -56,8 +56,12 @@ export async function signup(state: FormState, formData: FormData) {
     })
 
     await createSession(user.id, user.role)
-    return { success: true, message: 'OK' }
+    redirect('/')
   } catch (error) {
+    if ((error as any)?.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error
+    }
+    console.error('Signup error:', error)
     return { message: 'حدث خطأ أثناء التسجيل. حاول مرة أخرى.' }
   }
 }
@@ -89,8 +93,11 @@ export async function login(state: FormState, formData: FormData) {
     }
 
     await createSession(user.id, user.role)
-    return { success: true, message: 'OK' }
+    redirect('/')
   } catch (error) {
+    if ((error as any)?.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error
+    }
     console.error('Login error:', error)
     return { message: 'حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى.' }
   }

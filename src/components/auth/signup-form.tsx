@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState } from 'react'
 import { signup, type FormState } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,12 +8,6 @@ import { User, Mail, Lock, UserPlus } from 'lucide-react'
 
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined)
-
-  useEffect(() => {
-    if (state?.success) {
-      window.location.href = '/'
-    }
-  }, [state])
 
   return (
     <form action={action} className="space-y-5">

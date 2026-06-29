@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState } from 'react'
 import { login, type FormState } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,12 +8,6 @@ import { Mail, Lock, LogIn } from 'lucide-react'
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined)
-
-  useEffect(() => {
-    if (state?.success) {
-      window.location.href = '/'
-    }
-  }, [state])
 
   return (
     <form action={action} className="space-y-5">
