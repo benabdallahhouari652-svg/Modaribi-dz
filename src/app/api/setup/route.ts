@@ -4,13 +4,18 @@ import bcrypt from 'bcryptjs'
 
 export async function GET() {
   try {
+    const hash = await bcrypt.hash('123456', 10)
+
     // Check if admin already exists
     const existing = await prisma.user.findUnique({ where: { email: 'admin@modaribi.dz' } })
     if (existing) {
-      return NextResponse.json({ message: '✅ النظام جاهز مسبقاً، admin موجود' })
+      // Force reset password hash
+      await prisma.user.update({
+        where: { email: 'admin@modaribi.dz' },
+        data: { passwordHash: hash, isActive: true },
+      })
+      return NextResponse.json({ message: '✅ تم إعادة تعيين كلمة السر: admin@modaribi.dz / 123456' })
     }
-
-    const hash = await bcrypt.hash('123456', 10)
 
     // Create admin
     await prisma.user.create({
